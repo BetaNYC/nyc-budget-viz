@@ -1,5 +1,11 @@
 # NYC Budget Explorer
 
+> **This explorer has moved.** It now lives at
+> <https://betanyc.github.io/New-York-City-Budget/agencies/>, with its source in
+> [BetaNYC/New-York-City-Budget](https://github.com/BetaNYC/New-York-City-Budget) (`viz/agencies/`).
+> This repository is kept for history. Its Pages site forwards old links, including
+> `#fund-detail/...` routes, to the new address.
+
 A multi-year visualization of **New York City's expense budget**, built by
 [BetaNYC](https://beta.nyc). It shows every city agency's budget — broken down by unit of
 appropriation — across Fiscal Years 2017 through 2027, and compares each agency's **adopted**
