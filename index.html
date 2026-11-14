@@ -5,12 +5,38 @@
   <title>The NYC Budget Explorer has moved — BetaNYC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <link rel="canonical" href="https://betanyc.github.io/New-York-City-Budget/agencies/">
+  <link rel="canonical" href="https://betanyc.github.io/New-York-City-Budget/explorer/">
+  <!--
+    BetaNYC/New-York-City-Budget#271: this explorer now lives in the budget explorer, at
+    https://betanyc.github.io/New-York-City-Budget/explorer/#view=agencies
+    GitHub Pages can't redirect on a #fragment (browsers never send it), so this script reads the
+    old link and forwards it in one step:
+      #?year=Y                                         -> view=agencies&abfy=Y
+      #fund-detail/<agency>(/<unit>)?year=Y            -> view=agencies&abfy=Y&legacy=<agency>(/<unit>)
+      #control-officer-detail/<agency>(/<unit>)?year=Y -> the same as fund-detail
+    The mapping is copied unchanged from the budget repo's own forwarder, viz/agencies/index.html
+    (commit ecfe5ef), the ES5 twin of legacyToExplorerHash in viz/explorer/src/agency/legacy.js.
+    Do not change it here. The explorer resolves `legacy` against every name each agency had.
+  -->
   <script>
-    // Forward to the new home, keeping the #fund-detail/... route.
-    location.replace("https://betanyc.github.io/New-York-City-Budget/agencies/" + location.hash);
+    (function () {
+      var EXPLORER = "https://betanyc.github.io/New-York-City-Budget/explorer/";
+      var h = (location.hash || "").replace(/^#/, "");
+      var q = h.indexOf("?");
+      var path = q < 0 ? h : h.slice(0, q);
+      var query = q < 0 ? "" : h.slice(q + 1);
+      var params = ["view=agencies"];
+      var year = parseInt(new URLSearchParams(query).get("year") || "", 10);
+      if (isFinite(year)) params.push("abfy=" + year);
+      var route = /^(?:fund-detail|control-officer-detail)\/([^?]+)/.exec(path);
+      if (route) {
+        var legacy = route[1].split("/").filter(Boolean).slice(0, 2).join("/");
+        if (legacy) params.push("legacy=" + encodeURIComponent(legacy).replace(/%2F/g, "/"));
+      }
+      window.FORWARD_TO = EXPLORER + "#" + params.join("&");
+      location.replace(window.FORWARD_TO);
+    })();
   </script>
-  <noscript><meta http-equiv="refresh" content="0; url=https://betanyc.github.io/New-York-City-Budget/agencies/"></noscript>
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; }
     a { color: #2359a8; }
@@ -19,8 +45,11 @@
 </head>
 <body>
   <h1>The NYC Budget Explorer has moved</h1>
-  <p>It now lives with BetaNYC's other budget tools: <a id="forward" href="https://betanyc.github.io/New-York-City-Budget/agencies/">https://betanyc.github.io/New-York-City-Budget/agencies/</a></p>
+  <p>Every City agency's budget is now in BetaNYC's budget explorer. If this page does not send you there, follow this link:</p>
+  <p><a id="forward" href="https://betanyc.github.io/New-York-City-Budget/explorer/#view=agencies">https://betanyc.github.io/New-York-City-Budget/explorer/#view=agencies</a></p>
+  <p>Old links still work: a link to an agency, a unit or a year opens the same agency, unit and year there.</p>
   <p class="correction-note"><strong>Correction, November 9, 2026:</strong> until this date, every year in this explorer was labeled one year late. For example, the FY2025 adopted budget was shown as 2026. The labels are now fixed. <a href="https://betanyc.github.io/New-York-City-Budget/agencies/faq.html#correction">What changed</a></p>
-  <script>document.getElementById("forward").href = "https://betanyc.github.io/New-York-City-Budget/agencies/" + location.hash;</script>
+  <p>The data download is still here: <a href="data/nyc_budget.csv" download>every agency, unit and year (CSV)</a>. The <a href="https://betanyc.github.io/New-York-City-Budget/agencies/data/nyc_budget.csv">copy at the new address</a> has the same figures, without the Control Officer column and three empty columns.</p>
+  <script>if (window.FORWARD_TO) document.getElementById("forward").href = window.FORWARD_TO;</script>
 </body>
 </html>
